@@ -1,14 +1,38 @@
-Documentação de todo desenvolvimento realizado no Projeto Integrador do 5° semestre de engenharia da computação, no Centro Universitário Senac. O intuito desse projeto foi criar um sistema de energia renovável, e realizar coleta e tratamento de dados a partir de um microprocessador.
+# Projeto Integrador - 5° Semestre de Engenharia da Computação
 
-Para a coleta e análise dos dados gerados por duas placas solares, foi utilizada uma
-placa ESP32 devido à sua capacidade de processamento, conectividade Wi-Fi, e
-versatilidade na integração de sensores.
+Este repositório contém a documentação completa do desenvolvimento realizado no Projeto Integrador do 5° semestre de Engenharia da Computação no Centro Universitário Senac.
 
+## Descrição do Projeto
 
+O objetivo deste projeto foi criar um sistema de energia renovável e realizar a coleta e tratamento de dados utilizando um microprocessador. O projeto incluiu o monitoramento de dados gerados por placas solares, processamento de informações e a apresentação de resultados em uma interface visual.
+
+---
+
+## Tecnologias Utilizadas
+
+- **Microcontrolador:** ESP32 (DOIT DEVKIT)
+- **Banco de Dados:** MySQL
+- **Linguagens de Programação:**
+  - Backend: PHP
+  - Frontend: HTML, CSS, JavaScript
+- **Bibliotecas:**
+  - Chart.js (para visualização de dados)
+
+---
+
+## Implementação
+
+### Coleta e Processamento de Dados
+
+Para a coleta e análise de dados gerados pelas placas solares, utilizamos uma placa **ESP32**, devido às seguintes características:
+- Capacidade de processamento eficiente.
+- Conectividade Wi-Fi.
+- Versatilidade na integração com sensores.
+
+A seguir está o código utilizado para coletar dados do banco e retorná-los em formato JSON:
+
+```php
 <?php
-
-// executa uma consulta para selecionar os dados de hora e temperatura
-// da tabela dados, e retorna os resultados no formato JSON.
 
 // Configurações do banco de dados
 $servername = "localhost";
@@ -24,16 +48,15 @@ if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
-// Query para selecionar os dados do banco de dados
+// Consulta para selecionar os dados
 $sql = "SELECT hora, temperatura FROM dados";
 $result = $conn->query($sql);
 
 // Array para armazenar os dados
 $data = array();
 
-// Verifica se há dados e os adiciona ao array
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch_assoc()) {
         $data[] = $row;
     }
 }
@@ -47,22 +70,21 @@ $conn->close();
 
 
 
-Uma parte crucial do processo é a utilização de uma API para lidar com os dados enviados
-pelo dispositivo de coleta, no caso o ESP32 (DOIT DEVKIT). Esta API é responsável por
-receber os dados enviados pelo dispositivo e inseri-los no banco de dados MySQL, utilizando
-as credenciais fornecidas pelo professor para acesso ao banco de dados.
+## Envio de Dados via ESP32
+A API criada recebe os dados do ESP32 e os insere no banco de dados. O seguinte código Arduino foi utilizado para envio dos dados:
+
 
 #include <Ethernet.h>
 #include <SPI.h>
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress server(192, 168, 1, 100); // Endereço IP do servidor onde o script PHP está hospedado
+IPAddress server(192, 168, 1, 100); // Endereço IP do servidor
 EthernetClient client;
 
 void setup() {
   Ethernet.begin(mac);
   Serial.begin(9600);
-  delay(1000); // Espera a conexão Ethernet
+  delay(1000);
 }
 
 void loop() {
@@ -77,7 +99,7 @@ void loop() {
     client.print("&temperatura=");
     client.print(temperatura);
     client.println(" HTTP/1.1");
-    client.println("Host: 192.168.1.100"); //
+    client.println("Host: 192.168.1.100");
     client.println("Connection: close");
     client.println();
   } else {
@@ -95,18 +117,11 @@ String obterHora() {
   // Código para obter a hora
 }
 
-
-Outro aspecto importante é a visualização dos resultados obtidos a partir da coleta de
-dados dos sensores, como temperatura, umidade, tensão e corrente. Para isso, é
-implementado um código que se comunica com o banco de dados e o código PHP, 
-retornando os gráficos correspondentes em uma página web com um tempo de resposta
-breve. As linguagens de programação utilizadas para esta finalidade são HTML, CSS e
-JavaScript. O HTML define a estrutura da página, o CSS o estilo e o JavaScript é responsável
-por carregar os dados do servidor utilizando a URL do PHP, processá-los e criar os gráficos
-utilizando a biblioteca Chart.js.
+## Visualização de Dados
+Para exibir os dados coletados de forma visual, implementamos uma interface web. O HTML, CSS e JavaScript foram usados para estruturar, estilizar e carregar os dados.
+A biblioteca Chart.js foi utilizada para criar os gráficos. Abaixo está o código da página:
 
 <!DOCTYPE html>
-    
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -117,13 +132,7 @@ utilizando a biblioteca Chart.js.
   <canvas id="graficoTemperatura"></canvas>
 
   <script>
-
-//criamos uma página HTML simples com um elemento <canvas> onde o gráfico será desenhado.
-// Em seguida, usamos JavaScript para carregar os dados do arquivo PHP dados.php (que ainda não foi criado),
-// e depois usamos a biblioteca Chart.js para
-//criar um gráfico de barras com os dados de hora e temperatura.
-
-    // Função para carregar os dados do banco de dados e exibir no gráfico
+    // Função para carregar os dados do banco e exibir no gráfico
     function carregarDados() {
       fetch('dados.php')
       .then(response => response.json())
@@ -156,9 +165,8 @@ utilizando a biblioteca Chart.js.
       });
     }
 
-    // Chama a função para carregar os dados quando a página carregar
+    // Chama a função ao carregar a página
     window.onload = carregarDados;
-
   </script>
 </body>
 </html>
