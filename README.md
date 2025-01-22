@@ -36,8 +36,8 @@ A seguir está o código utilizado para coletar dados do banco e retorná-los em
 
 // Configurações do banco de dados
 $servername = "localhost";
-$username = "engenharia_08";
-$password = "gaviaoreal";
+$username = "(*/ω＼*)";
+$password = "(^///^)";
 $dbname = "engenharia_08";
 
 // Conexão com o banco de dados
